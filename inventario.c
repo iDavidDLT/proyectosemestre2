@@ -2,15 +2,6 @@
 #include <string.h>
 #include "inventario.h"
 
-int maxProductos = 20;
-int maxNombre = 50;
-
-char nombres[20][50];
-int cantidades[20];
-float precios[20];
-
-int numRepuestos = 0;
-
 void imprimirMenu() {
     printf("\n=====================================\n");
     printf("|              Menu                 |\n");
@@ -19,17 +10,47 @@ void imprimirMenu() {
     printf("| 2. Editar repuesto                |\n");
     printf("| 3. Eliminar repuesto              |\n");
     printf("| 4. Listar repuestos               |\n");
-    printf("| 5. Salir                          |\n");
+    printf("| 5. Buscar repuesto                |\n");
+    printf("| 6. Salir                          |\n");
     printf("=====================================\n");
 }
 
-void ingresarRepuesto() {
-    if (numRepuestos >= maxProductos) {
+void cargarInventario(char nombres[][MAX_NOMBRE], int cantidades[], float precios[], int *numRepuestos) {
+    FILE *file = fopen("inventario.txt", "r");
+    if (file == NULL) {
+        printf("No se pudo abrir el archivo de inventario.\n");
+        return;
+    }
+
+    *numRepuestos = 0;
+    while (fscanf(file, "%s %d %f", nombres[*numRepuestos], &cantidades[*numRepuestos], &precios[*numRepuestos]) != EOF) {
+        (*numRepuestos)++;
+    }
+
+    fclose(file);
+}
+
+void guardarInventario(const char nombres[][MAX_NOMBRE], const int cantidades[], const float precios[], int numRepuestos) {
+    FILE *file = fopen("inventario.txt", "w");
+    if (file == NULL) {
+        printf("No se pudo abrir el archivo de inventario.\n");
+        return;
+    }
+
+    for (int i = 0; i < numRepuestos; i++) {
+        fprintf(file, "%s %d %f\n", nombres[i], cantidades[i], precios[i]);
+    }
+
+    fclose(file);
+}
+
+void ingresarRepuesto(char nombres[][MAX_NOMBRE], int cantidades[], float precios[], int *numRepuestos) {
+    if (*numRepuestos >= MAX_PRODUCTOS) {
         printf("Error: inventario lleno.\n");
         return;
     }
 
-    char nombreNuevo[50];
+    char nombreNuevo[MAX_NOMBRE];
     int cantidadNueva;
     float precioNuevo;
 
@@ -37,7 +58,7 @@ void ingresarRepuesto() {
     scanf("%s", nombreNuevo);
 
     // Verificar si el repuesto ya existe
-    for (int i = 0; i < numRepuestos; i++) {
+    for (int i = 0; i < *numRepuestos; i++) {
         if (strcmp(nombres[i], nombreNuevo) == 0) {
             while (1) {
                 printf("Ingrese la cantidad adicional: ");
@@ -50,13 +71,14 @@ void ingresarRepuesto() {
             }
             cantidades[i] += cantidadNueva;
             printf("Cantidad actualizada correctamente.\n");
+            guardarInventario(nombres, cantidades, precios, *numRepuestos);
             return;
         }
     }
 
     // Agregar el nuevo repuesto
-    strcpy(nombres[numRepuestos], nombreNuevo);
-    
+    strcpy(nombres[*numRepuestos], nombreNuevo);
+
     // Verificar la cantidad ingresada
     while (1) {
         printf("Ingrese la cantidad: ");
@@ -79,16 +101,16 @@ void ingresarRepuesto() {
         }
     }
 
-    cantidades[numRepuestos] = cantidadNueva;
-    precios[numRepuestos] = precioNuevo;
+    cantidades[*numRepuestos] = cantidadNueva;
+    precios[*numRepuestos] = precioNuevo;
 
-    numRepuestos++;
+    (*numRepuestos)++;
     printf("Repuesto ingresado correctamente.\n");
+    guardarInventario(nombres, cantidades, precios, *numRepuestos);
 }
 
-
-void editarRepuesto() {
-    char nombreEditar[50];
+void editarRepuesto(char nombres[][MAX_NOMBRE], int cantidades[], float precios[], int numRepuestos) {
+    char nombreEditar[MAX_NOMBRE];
     int nuevaCantidad;
 
     printf("Ingrese el nombre del repuesto a editar: ");
@@ -107,6 +129,7 @@ void editarRepuesto() {
             }
             cantidades[i] = nuevaCantidad;
             printf("Repuesto editado correctamente.\n");
+            guardarInventario(nombres, cantidades, precios, numRepuestos);
             return;
         }
     }
@@ -114,23 +137,23 @@ void editarRepuesto() {
     printf("Repuesto no encontrado.\n");
 }
 
-
-void eliminarRepuesto() {
-    char nombreEliminar[50];
+void eliminarRepuesto(char nombres[][MAX_NOMBRE], int cantidades[], float precios[], int *numRepuestos) {
+    char nombreEliminar[MAX_NOMBRE];
     printf("Ingrese el nombre del repuesto a eliminar: ");
     scanf("%s", nombreEliminar);
 
-    for (int i = 0; i < numRepuestos; i++) {
+    for (int i = 0; i < *numRepuestos; i++) {
         if (strcmp(nombres[i], nombreEliminar) == 0) {
-            for (int j = i; j < numRepuestos - 1; j++) {
-                for (int k = 0; k < maxNombre; k++) {
+            for (int j = i; j < *numRepuestos - 1; j++) {
+                for (int k = 0; k < MAX_NOMBRE; k++) {
                     nombres[j][k] = nombres[j + 1][k];
                 }
                 cantidades[j] = cantidades[j + 1];
                 precios[j] = precios[j + 1];
             }
-            numRepuestos--;
+            (*numRepuestos)--;
             printf("Repuesto eliminado correctamente.\n");
+            guardarInventario(nombres, cantidades, precios, *numRepuestos);
             return;
         }
     }
@@ -138,7 +161,7 @@ void eliminarRepuesto() {
     printf("Repuesto no encontrado.\n");
 }
 
-void listarRepuestos() {
+void listarRepuestos(const char nombres[][MAX_NOMBRE], const int cantidades[], const float precios[], int numRepuestos) {
     printf("=======================================================\n");
     printf("| %-25s | %10s | %10s | %10s |\n", "Nombre del Repuesto", "Cantidad", "Precio", "Total");
     printf("=======================================================\n");
@@ -155,4 +178,22 @@ void listarRepuestos() {
     printf("=======================================================\n");
 }
 
+void buscarRepuesto(const char nombres[][MAX_NOMBRE], const int cantidades[], const float precios[], int numRepuestos) {
+    char nombreBuscar[MAX_NOMBRE];
+    printf("Ingrese el nombre del repuesto a buscar: ");
+    scanf("%s", nombreBuscar);
 
+    for (int i = 0; i < numRepuestos; i++) {
+        if (strcmp(nombres[i], nombreBuscar) == 0) {
+            printf("=======================================================\n");
+            printf("| %-25s | %10s | %10s | %10s |\n", "Nombre del Repuesto", "Cantidad", "Precio", "Total");
+            printf("=======================================================\n");
+            float total = cantidades[i] * precios[i];
+            printf("| %-25s | %10d | $%9.2f | $%9.2f |\n", nombres[i], cantidades[i], precios[i], total);
+            printf("=======================================================\n");
+            return;
+        }
+    }
+
+    printf("Repuesto no encontrado.\n");
+}

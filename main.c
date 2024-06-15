@@ -1,19 +1,16 @@
 #include <stdio.h>
 #include "inventario.h"
 
-int main() {
-    char predefinidos[5][50] = {"Aceite", "Filtro_de_Aire", "Bujia", "Amortiguador", "Llantas"};
-    int cantidadesPredefinidos[5] = {0, 0, 0, 0, 0};
-    float preciosPredefinidos[5] = {20.0, 10.0, 5.0, 50.0, 100.0};
+#define MAX_PRODUCTOS 20
+#define MAX_NOMBRE 50
 
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < maxNombre; j++) {
-            nombres[i][j] = predefinidos[i][j];
-        }
-        cantidades[i] = cantidadesPredefinidos[i];
-        precios[i] = preciosPredefinidos[i];
-        numRepuestos++;
-    }
+int main() {
+    char nombres[MAX_PRODUCTOS][MAX_NOMBRE];
+    int cantidades[MAX_PRODUCTOS];
+    float precios[MAX_PRODUCTOS];
+    int numRepuestos = 0;
+
+    cargarInventario(nombres, cantidades, precios, &numRepuestos);
 
     int opcion;
 
@@ -24,27 +21,27 @@ int main() {
 
         switch(opcion) {
             case 1:
-                ingresarRepuesto();
+                ingresarRepuesto(nombres, cantidades, precios, &numRepuestos);
                 break;
             case 2:
-                editarRepuesto();
+                editarRepuesto(nombres, cantidades, precios, numRepuestos);
                 break;
             case 3:
-                eliminarRepuesto();
+                eliminarRepuesto(nombres, cantidades, precios, &numRepuestos);
                 break;
             case 4:
-                listarRepuestos();
+                listarRepuestos(nombres, cantidades, precios, numRepuestos);
                 break;
             case 5:
+                buscarRepuesto(nombres, cantidades, precios, numRepuestos);
+                break;
+            case 6:
                 printf("Saliendo del programa...\n");
                 break;
             default:
                 printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
         }
-    } while(opcion != 5);
+    } while(opcion != 6);
 
     return 0;
 }
-
-
-
