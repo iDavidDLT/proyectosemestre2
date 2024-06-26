@@ -2,18 +2,6 @@
 #include <string.h>
 #include "inventario.h"
 
-void imprimirMenu() {
-    printf("\n=====================================\n");
-    printf("|              Menu                 |\n");
-    printf("=====================================\n");
-    printf("| 1. Ingresar nuevo repuesto        |\n");
-    printf("| 2. Editar repuesto                |\n");
-    printf("| 3. Eliminar repuesto              |\n");
-    printf("| 4. Listar repuestos               |\n");
-    printf("| 5. Buscar repuesto                |\n");
-    printf("| 6. Salir                          |\n");
-    printf("=====================================\n");
-}
 
 void cargarInventario(char nombres[][MAX_NOMBRE], int cantidades[], float precios[], int *numRepuestos) {
     FILE *file = fopen("inventario.txt", "r");
