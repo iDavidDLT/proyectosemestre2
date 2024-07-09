@@ -4,6 +4,12 @@
 #define MAX_NOMBRE 100
 #define MAX_CEDULA 11
 
+#define MAX_PRODUCTOS 100
+#define MAX_CLIENTES 100
+#define MAX_FACTURAS 100
+#define MAX_NOMBRE 100
+#define MAX_CEDULA 11
+
 // Funciones de inventario (productos)
 void cargarInventario(char nombres[][MAX_NOMBRE], int cantidades[], float precios[], int *numRepuestos);
 void guardarInventario(const char nombres[][MAX_NOMBRE], const int cantidades[], const float precios[], int numRepuestos);
